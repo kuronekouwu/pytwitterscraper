@@ -3,8 +3,8 @@ Get data from twitter using REST API from Twitter :3
 
 # Prerequisites
 Before you begin, ensure you have met the following requirements:
-    - Python 3.6 +
-    - Internet Connnetion
+* Python 3.6
+* Internet Connnetion
 
 # Installation
 To install pytwitterscraper::
