@@ -103,8 +103,4 @@ I have to thanks for source code from
 
 # License
 
-<<<<<<< HEAD
 MIT
-=======
-MIT
->>>>>>> 0443f14bc632695e0c29254536476ae6a54c9ae2
