@@ -36,7 +36,7 @@ OK You have able to use pytwitterscraper
 # Example Code
 1. Get Profile **Example : I want get profile from Shirakami Fubuki** :
     ```py 
-    >>> import pytwiiterscraper
+    >>> from pytwitterscraper import TwitterScraper
     >>> tw = TwitterScraper()
     >>> profile = tw.get_profile("shirakamifubuki")
     >>> profile.__dict__
@@ -45,7 +45,7 @@ OK You have able to use pytwitterscraper
 
 2. Get Tweet **Example : I want get tweets from Shirakami Fubuki** :
     ```py 
-    >>> import pytwiiterscraper
+    >>> from pytwitterscraper import TwitterScraper
     >>> tw = TwitterScraper()
     >>> tweets = tw.get_tweets(997786053124616192, count=3)
     >>> tweets.contents
@@ -54,7 +54,7 @@ OK You have able to use pytwitterscraper
 
 3. Get Tweet Info **Example : I want to get info ID Tweet 1324993735248109568** ::
     ```py
-    >>> import pytwiiterscraper
+    >>> from pytwitterscraper import TwitterScraper
     >>> tw = TwitterScraper()
     >>> twinfo = tw.get_tweetinfo(1324993735248109568)
     >>> twinfo.contents
@@ -63,7 +63,7 @@ OK You have able to use pytwitterscraper
 
 4. Get Tweet Comments **Example : I want to get comments from ID Tweet 1324993735248109568** ::
     ```py
-    >>> import pytwiiterscraper
+    >>> from pytwitterscraper import TwitterScraper
     >>> tw = TwitterScraper()
     >>> twcomments = tw.get_tweetcomments(1324993735248109568)
     >>> twcomments.contents
@@ -72,7 +72,7 @@ OK You have able to use pytwitterscraper
 
 5. Get Trend Twitter ::
     ```py
-    >>> import pytwiiterscraper
+    >>> from pytwitterscraper import TwitterScraper
     >>> tw = TwitterScraper()
     >>> trends = tw.get_trends()
     >>> trends.content
@@ -81,7 +81,7 @@ OK You have able to use pytwitterscraper
 
 6. Search Keyword 
     ```py
-    >>> import pytwiiterscraper
+    >>> from pytwitterscraper import TwitterScraper
     >>> tw = TwitterScraper()
     >>> search = tw.searchkeywords("tokinosora")
     >>> trends.users
