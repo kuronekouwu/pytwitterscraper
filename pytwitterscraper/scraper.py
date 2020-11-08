@@ -151,20 +151,20 @@ class TwitterScraper:
 				for datahashtags in data["entities"][dataentities] :
 					tweet["hashtags"].append(datahashtags["text"])
 
-					if dataentities == "media" :
-						for datamedias in data["entities"][dataentities] :
-							tweet["media"].append({
-								"url" : "%s" % datamedias["url"],
-								"type" : "%s" % datamedias["type"],
-								"image_url" : "%s" % datamedias["media_url_https"],
-								"twitter_url" : "%s" % datamedias["expanded_url"]
-							})
+			if dataentities == "media" :
+				for datamedias in data["entities"][dataentities] :
+					tweet["media"].append({
+						"url" : "%s" % datamedias["url"],
+						"type" : "%s" % datamedias["type"],
+						"image_url" : "%s" % datamedias["media_url_https"],
+						"twitter_url" : "%s" % datamedias["expanded_url"]
+					})
 
-					if dataentities == "urls" :
-						for dataurls in data["entities"][dataentities] :
-							tweet["urls"].append({
-								"url" : "%s" % dataurls["url"]
-							})
+			if dataentities == "urls" :
+				for dataurls in data["entities"][dataentities] :
+					tweet["urls"].append({
+						"url" : "%s" % dataurls["url"]
+					})
 
 		return TwitterScraperTweets(
 			twitter_data=tweet
