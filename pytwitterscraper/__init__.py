@@ -1,3 +1,2 @@
-from scrapperresult import TwitterScrapperResultProfile, TwitterScrapperTrends, TwitterScrapperTweets, TwitterSearchKeywords
-from scrapper import TwitterScrapper
-
+from scraperresult import TwitterScraperResultProfile, TwitterScraperTrends, TwitterScraperTweets, TwitterSearchKeywords
+from scraper import TwitterScraper
