@@ -4,11 +4,10 @@ import time
 import json
 import datetime
 from pprint import pprint
-from scraperresult import TwitterScraperResultProfile, TwitterScraperTrends, TwitterSearchKeywords, TwitterScraperTweets
 from requests_html import HTMLSession
 from urllib.parse import urlparse
 from fake_useragent import UserAgent
-
+from .scraperresult import TwitterScraperResultProfile, TwitterScraperTrends, TwitterSearchKeywords, TwitterScraperTweets
 
 class TwitterScraper:
 	def __init__(self) :
