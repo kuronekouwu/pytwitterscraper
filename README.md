@@ -1,4 +1,4 @@
-# Twitter Scrapper Python
+# Twitter Scraper Python
 Get data from twitter using REST API from Twitter :3
 
 # Prerequisites
