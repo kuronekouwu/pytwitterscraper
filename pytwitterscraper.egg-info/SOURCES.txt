@@ -1,0 +1,10 @@
+README.md
+setup.py
+pytwitterscraper/__init__.py
+pytwitterscraper/scraper.py
+pytwitterscraper/scraperresult.py
+pytwitterscraper.egg-info/PKG-INFO
+pytwitterscraper.egg-info/SOURCES.txt
+pytwitterscraper.egg-info/dependency_links.txt
+pytwitterscraper.egg-info/requires.txt
+pytwitterscraper.egg-info/top_level.txt
