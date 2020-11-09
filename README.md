@@ -8,20 +8,19 @@ Before you begin, ensure you have met the following requirements:
 
 # Installation
 To install pytwitterscraper :
-    ```
+
     pip install pytwitterscraper
-    ```
+
 
 # Usage 
 First you have import libray pytwitterscraper :
-    ```
+    
     from pytwitterscraper import TwitterScraper
-    ```
+    
 
-and call class object TwitterScraper::
-    ```
+and call class object TwitterScraper :
+
     tw = TwitterScraper()
-    ```
 
 If you have step by step You have able to use pytwitterscraper
 
