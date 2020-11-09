@@ -2,14 +2,15 @@ from datetime import datetime
 
 class TwitterScraperResultProfile :
 	def __init__(self,
-		twitter_id: int, twitter_name: str, twitter_description: str, twitter_url: str, twitter_follower: int, twitter_following: int, 
+		twitter_id: int, twitter_name: str, twitter_description: str, twitter_url: str, twitter_follower: int, twitter_following: int, twitter_location: str, 
 		twitter_createat: datetime, twitter_extended_url: str ,twitter_tweet: int, twitter_media: int, twitter_profileurl : str, twitter_bannerurl: str,
 		twitter_screenname: str, twitter_verifed: bool) :
 			self.id = twitter_id
 			self.name = twitter_name
-			self.screenname = twitter_screenname
+			self.screen_name = twitter_screenname
 			self.url = twitter_url
 			self.description = twitter_description
+			self.location= twitter_location
 			self.verifed = twitter_verifed
 			self.follower = twitter_follower
 			self.following = twitter_following
