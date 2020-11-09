@@ -3,16 +3,18 @@ import re
 import time
 import json
 import datetime
-from pprint import pprint
 from requests_html import HTMLSession
-from urllib.parse import urlparse
 from fake_useragent import UserAgent
-from .scraperresult import TwitterScraperResultProfile, TwitterScraperTrends, TwitterSearchKeywords, TwitterScraperTweets
+from scraperresult import TwitterScraperResultProfile, TwitterScraperTrends, TwitterSearchKeywords, TwitterScraperTweets
 
 class TwitterScraper:
 	def __init__(self) :
 		self.url = "https://twitter.com/"
 		self.api = "https://api.twitter.com/"
+
+		#Target URL
+		self.profile_withname = "graphql/4S2ihIKfF3xhp-ENxvUAfQ/UserByScreenName?variables=%7B%22screen_name%22%3A%22{}%22%2C%22withHighlightedLabel%22%3Atrue%7D"
+		self.profile_withid = "i/api/2/timeline/profile/{}.json?tweet_mode=extended&count=1&userId={}&count=1"
 
 		self.user_agent = UserAgent().firefox
 
@@ -20,29 +22,46 @@ class TwitterScraper:
 		self.xguest = self.__getxguesttoken()
 
 	#Public Function
-	def get_profile(self, name) -> dict :
-		session = HTMLSession()
-		resp = session.get(
-			(self.api + f"graphql/4S2ihIKfF3xhp-ENxvUAfQ/UserByScreenName?variables=%7B%22screen_name%22%3A%22{name}%22%2C%22withHighlightedLabel%22%3Atrue%7D"),
-			headers=self.__getdataheaders()
+	def get_profile(self, name: str=None, id: str=None) -> dict :
+		target = None
+		if not name is None :
+			url = self.api
+			target = self.profile_withname.format(name)
+		elif not id is None :
+			url = self.url
+			target = self.profile_withid.format(id,id)
+
+		resp = self.__requestsdata(
+			url=url,
+			target=target
 		)
+
 		data = resp.json()
 
 		if resp.status_code >= 200 :
-			if len(data["data"]) == 0 :
+			if "data" in data :
+				if len(data["data"]) == 0 :
+					raise Exception("Error! User Not Found!")
+					return False
+			elif "errors" in data :
 				raise Exception("Error! User Not Found!")
 				return False
 
-			dataall = data["data"]["user"]
-			dataprofile = resp.json()["data"]["user"]["legacy"]
+			if not name is None :
+				dataall = data["data"]["user"]
+				dataprofile = data["data"]["user"]["legacy"]
+			elif not id is None :
+				dataall = data["globalObjects"]["users"]["%s" % id]
+				dataprofile = data["globalObjects"]["users"]["%s" % id]
 
 			return TwitterScraperResultProfile(
-				twitter_id=dataall["rest_id"],
+				twitter_id=dataall["rest_id"] if "rest_id" in dataall else dataall["id_str"],
 				twitter_name=dataprofile["name"],
 				twitter_url=self.url + dataprofile["screen_name"],
 				twitter_screenname=dataprofile["screen_name"],
+				twitter_location=dataprofile["location"],
 				twitter_description=dataprofile["description"] if "description" in dataprofile else None ,
-				twitter_verifed=dataprofile["verified"],
+				twitter_verifed=dataprofile["verified"] if "verified" in dataprofile else None,
 				twitter_follower=dataprofile["followers_count"],
 				twitter_following=dataprofile["friends_count"] ,
 				twitter_tweet=dataprofile["statuses_count"] if "statuses_count" in dataprofile else None ,
@@ -53,14 +72,13 @@ class TwitterScraper:
 				twitter_createat=datetime.datetime.strptime(dataprofile["created_at"],"%a %b %d %H:%M:%S %z %Y"),
 			)
 
-	def get_tweets(self,id: int=None,count: int=20) :
+	def get_tweets(self,id: str=None,count: int=20) :
 		i = 0
 		tweets = []
 
-		session = HTMLSession()
-		resp = session.get(
-			(self.url + f"i/api/2/timeline/profile/{id}.json?userId={id}&count={count}"),
-			headers=self.__getdataheaders()
+		resp = self.__requestsdata(
+			url=self.url,
+			target=f"i/api/2/timeline/profile/{id}.json?userId={id}&count={count}"
 		)
 
 		if resp.status_code >= 400 :
@@ -71,7 +89,7 @@ class TwitterScraper:
 
 		for idtweet in tweetslist :
 			datatweets = tweetslist[idtweet]
-			if int(datatweets["user_id_str"]) == id :
+			if int(datatweets["user_id_str"]) == int(id) :
 				tweets.append({
 					"id" : int(datatweets["id_str"]),
 					"created_at" : datetime.datetime.strptime(datatweets["created_at"],"%a %b %d %H:%M:%S %z %Y"),
@@ -114,13 +132,12 @@ class TwitterScraper:
 			twitter_data=tweets
 		)
 
-	def get_tweetinfo(self, id=None, count=20) :
+	def get_tweetinfo(self, id: str =None, count=20) :
 		tweet = {}
 
-		session = HTMLSession()
-		resp = session.get(
-			(self.url + f"i/api/2/timeline/conversation/{id}.json?tweet_mode=extended&count={count}"),
-			headers=self.__getdataheaders()
+		resp = self.__requestsdata(
+			url=self.url,
+			target=f"i/api/2/timeline/conversation/{id}.json?tweet_mode=extended&count={count}"
 		)
 
 		if resp.status_code >= 400 :
@@ -132,7 +149,7 @@ class TwitterScraper:
 			"id" : int(data["id_str"]),
 			"created_at" : datetime.datetime.strptime(data["created_at"],"%a %b %d %H:%M:%S %z %Y"),
 			"lang" : "%s" % data["lang"],
-			"text" : "%s" % data["full_text"] if "full_text" in data else data["text"].strip("\n"),
+			"text" : "%s" % data["full_text"] if "full_text" in data else data["text"],
 			"hashtags" : [],
 			"media" : [],
 			"urls" : [],
@@ -171,10 +188,9 @@ class TwitterScraper:
 	def get_trends(self) :
 		name_trend = []
 
-		session = HTMLSession()
-		resp = session.get(
-			(self.api + "2/guide.json?tcount=20&tab_category=objective_trends"),
-			headers=self.__getdataheaders()
+		resp = self.__requestsdata(
+			url=self.api,
+			target=f"2/guide.json?tcount=20&tab_category=objective_trends"
 		)
 
 		data = resp.json()
@@ -193,14 +209,13 @@ class TwitterScraper:
 			twitter_data=name_trend
 		)
 
-	def get_tweetcomments(self,id: int=None) :
+	def get_tweetcomments(self,id: str=None) :
 		i = 0
 		commants = []
 
-		session = HTMLSession()
-		resp = session.get(
-			(self.url + f"i/api/2/timeline/conversation/{id}.json?tweet_mode=extended&count=20"),
-			headers=self.__getdataheaders()
+		resp = self.__requestsdata(
+			url=self.url,
+			target=f"i/api/2/timeline/conversation/{id}.json?tweet_mode=extended&count=10"
 		)
 
 		if resp.status_code >= 400 :
@@ -260,10 +275,9 @@ class TwitterScraper:
 		users = []
 		topics = []
 
-		session = HTMLSession()
-		resp = session.get(
-			(self.url+ f"i/api/1.1/search/typeahead.json?q={query}&src=search_box&result_type=events%2Cusers%2Ctopics"),
-			headers=self.__getdataheaders()
+		resp = self.__requestsdata(
+			url=self.url,
+			target=f"i/api/1.1/search/typeahead.json?q={query}&src=search_box&result_type=events%2Cusers%2Ctopics"
 		)
 
 		data = resp.json()
@@ -298,6 +312,24 @@ class TwitterScraper:
 			twitter_userdata=users,
 			twitter_topicsdata=topics
 		)
+
+	def __requestsdata(self,url,target) :
+		session = HTMLSession()
+		resp = session.get(
+			(url + target),
+			headers=self.__getdataheaders()
+		)
+
+		if resp.status_code == 403 :
+			self.token = self.__get_token()
+			self.xguest = self.__getxguesttoken()
+
+			resp = session.get(
+				(url + target),
+				headers=self.__getdataheaders()
+			)
+
+		return resp
 
 	#Private Fuction
 	def __get_token(self) -> str :
@@ -341,3 +373,6 @@ class TwitterScraper:
 		res["User-Agent"] = self.user_agent
 
 		return res
+
+tw = TwitterScraper()
+print(tw.get_profile(id="880317891249188864").__dict__)
