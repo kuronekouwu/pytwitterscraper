@@ -49,7 +49,7 @@ If you have step by step You have able to use pytwitterscraper
     ```py 
     >>> from pytwitterscraper import TwitterScraper
     >>> tw = TwitterScraper()
-    >>> profile = tw.get_profile(name="shirakamifubuki")
+    >>> profile = tw.get_profile(id="880317891249188864")
     >>> profile.__dict__
     >>> {'id': '880317891249188864', 'name': 'ときのそら🐻11/29.2ndLIVEパラレルタイム！', 'screen_name': 'tokino_sora', 'url': 'https://twitter.com/tokino_sora', 'description': '🎊 2ndアルバム『ON STAGE!』ビクターエンタテインメントより好評発売中！🎉11/29ときのそら2ndLIVE『パラレルタイム』開催決定！！🐻バーチャルアイドルときのそら(๑╹ᆺ╹)横アリ目指してがんばります୧(๑•̀ㅁ•́๑)૭✧❣️#ときのそら,#ときのそら生放送,#soraArt', 'location': '日本 東京', 'verifed': None, 'follower': 318548, 'following': 7123, 'extended_url': 'https://t.co/YVd92xsmZA', 'tweet': 19794, 'media': 1887, 'profileurl': 'https://pbs.twimg.com/profile_images/1296434665016844288/2RqmlpoD.jpg', 'bannerurl': 'https://pbs.twimg.com/profile_banners/880317891249188864/1602301415', 'createat': datetime.datetime(2017, 6, 29, 6, 51, 55, tzinfo=datetime.timezone.utc)}
     ```
