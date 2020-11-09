@@ -19,8 +19,6 @@ class TwitterScraper:
 		self.token = self.__get_token()
 		self.xguest = self.__getxguesttoken()
 
-		#self.cookieeth = "e92d661216a86aecff321699b43dd41c"
-
 	#Public Function
 	def get_profile(self, name) -> dict :
 		session = HTMLSession()
@@ -205,6 +203,9 @@ class TwitterScraper:
 			headers=self.__getdataheaders()
 		)
 
+		if resp.status_code >= 400 :
+			raise Exception("ID Tweet Not Found!")
+			
 		data = resp.json()["globalObjects"]["tweets"]
 
 		del data["%s" % id]
