@@ -5,7 +5,7 @@ import json
 import datetime
 from requests_html import HTMLSession
 from fake_useragent import UserAgent
-from scraperresult import TwitterScraperResultProfile, TwitterScraperTrends, TwitterSearchKeywords, TwitterScraperTweets
+from .scraperresult import TwitterScraperResultProfile, TwitterScraperTrends, TwitterSearchKeywords, TwitterScraperTweets
 
 class TwitterScraper:
 	def __init__(self) :
@@ -373,6 +373,3 @@ class TwitterScraper:
 		res["User-Agent"] = self.user_agent
 
 		return res
-
-tw = TwitterScraper()
-print(tw.get_profile(id="880317891249188864").__dict__)
