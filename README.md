@@ -22,13 +22,17 @@ and call class object TwitterScraper :
 
     tw = TwitterScraper()
 
-If you have step by step You have able to use pytwitterscraper
+or you can able to use proxy :
+
+    tw = TwitterScraper(proxy_enable=True, proxy_http="xxx.xxx.xxx.xxx:xxxx",proxy_https="xxx.xxx.xxx.xxx:xxxx")
+
+If you have step by step You can able to use pytwitterscraper
 
 # Class Object Data
 
 | Class Object Classes | Description |
 | ------ | ------ |
-| get_profile(name=None,id=None) | Get Profile from Twitter **With select Name or ID |
+| get_profile(name=None,id=None,ids=[None],names=[None]) | Get Profile from Twitter **With select Name or ID or Names or IDS** |
 | get_tweets(id,count=20) | Get List Tweet from Profille Twitter By ID |
 | get_tweetinfo(id,count=20) | Get Tweet Information By ID |
 | get_tweetcomments(id) | Get Tweet Comments By ID **Top 10 Comment** | 
@@ -99,6 +103,34 @@ If you have step by step You have able to use pytwitterscraper
     >>> [{'name': 'ときのそら🐻11/29.2ndLIVEパラレルタイム！', 'url': 'https://twitter.com/tokino_sora', 'profileurl': 'http://pbs.twimg.com/profile_images/1296434665016844288/2RqmlpoD_normal.jpg', 'bannerurl': 'https://pbs.twimg.com/profile_images/1296434665016844288/2RqmlpoD_normal.jpg', 'screen_name': 'tokino_sora', 'tags': ['tokino_sora', '@tokino_sora', 'tokino', 'sora', 'ときのそら🐻11/29.2ndliveパラレルタイム!']}, {'name': '時野空人', 'url': 'https://twitter.com/TokinoSorahito', 'profileurl': 'http://pbs.twimg.com/profile_images/480667036410863616/yeHCL21U_normal.png', 'bannerurl': 'https://pbs.twimg.com/profile_images/480667036410863616/yeHCL21U_normal.png', 'screen_name': 'TokinoSorahito', 'tags': ['tokinosorahito', '@tokinosorahito', '時野空人']}, {'name': 'Tokino Sora', 'url': 'https://twitter.com/TokinoSora25', 'profileurl': 'http://pbs.twimg.com/profile_images/1320705788218765313/xDbzLV47_normal.jpg', 'bannerurl': 'https://pbs.twimg.com/profile_images/1320705788218765313/xDbzLV47_normal.jpg', 'screen_name': 'TokinoSora25', 'tags': ['tokinosora25', '@tokinosora25', 'tokino', 'sora']}, {'name': 'Neil Qu', 'url': 'https://twitter.com/TokinoSoraFan', 'profileurl': 'http://pbs.twimg.com/profile_images/1222368653758255104/cmvSX51v_normal.jpg', 'bannerurl': 'https://pbs.twimg.com/profile_images/1222368653758255104/cmvSX51v_normal.jpg', 'screen_name': 'TokinoSoraFan', 'tags': ['tokinosorafan', '@tokinosorafan', 'neil', 'qu']}, {'name': "tokino sora's camera stand", 'url': 'https://twitter.com/randomrubeee', 'profileurl': 'http://pbs.twimg.com/profile_images/1325110251356643331/S6ctgUp0_normal.jpg', 'bannerurl': 'https://pbs.twimg.com/profile_images/1325110251356643331/S6ctgUp0_normal.jpg', 'screen_name': 'randomrubeee', 'tags': ['randomrubeee', '@randomrubeee', 'tokino', "sora's", 'camera', 'stand']}, {'name': 'Simp 4 Tokino Sora', 'url': 'https://twitter.com/kalatnieufene', 'profileurl': 'http://pbs.twimg.com/profile_images/1281801965815517185/DDaYI5yo_normal.jpg', 'bannerurl': 'https://pbs.twimg.com/profile_images/1281801965815517185/DDaYI5yo_normal.jpg', 'screen_name': 'kalatnieufene', 'tags': ['kalatnieufene', '@kalatnieufene', 'simp', '4', 'tokino', 'sora']}, {'name': 'sora tokino', 'url': 'https://twitter.com/sora_tokino', 'profileurl': 'http://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png', 'bannerurl': 'https://abs.twimg.com/sticky/default_profile_images/default_profile_normal.png', 'screen_name': 'sora_tokino', 'tags': ['sora_tokino', '@sora_tokino', 'sora', 'tokino']}]
     >>> trends.topics
     >>> []
+    ```
+8. Get Profile **Example: I want get profile Tokino Sora by ID but i want use proxy not to rate limit** (HTTPS Required!) :
+    ```py
+    >>> from pytwitterscraper import TwitterScraper
+    >>> tw = TwitterScraper(proxy_enable=True, proxy_http="xxx.xxx.xxx.xxx:xxxx",proxy_https="xxx.xxx.xxx.xxx:xxxx")
+    >>> tw.get_profile(id=880317891249188864).__dict__
+    >>> {'id': 880317891249188864, 'name': 'ときのそら�🐻ONSTAG！！', 'screen_name': 'tokino_sora', 'url': 'https://t.co/YVd92xsmZA', 'description': '🎊🎊 nアルバムム『『ON STAE』ビクターエンタテインrトより好評発売中！�🎉11/2ときのそらら2ndLIV『パラレルタイム』開催決定！！��バーチャルアイドルときのそそらら(๑╹╹横アリ目指してがんばりまますす୧(•̀ㅁㅁ•́๑)૭✧️ときのそそら,ときのそら生放放送送,#soraArttion': '日本 東京', 'entities': {'url': {'urls': [{'url': 'https://t.co/YVd92xsmZA', 'expanded_url': 'https://youtube.com/channel/UCp6993wxpyDPHUpavwDFqgg?sub_confirmation=1', 'display_urlocation': '日本 東京', 'entities': {'url': {'urls': [{'url': 'https://t.co/YVd92xsmZA', 'expanded_url': 'https://youtube.com/channel/UCp6993wxpyDPHUpavwDFqgg?sub_confirmation=1', 'display_url': 'youtube.com/channel/UCp699…', 'indices': [0, 23]}]}, 'description': {'urls': []}}, 'verifed': False, 'follower': 347116, 'following': 7125, 'extended_url': 'https://t.co/YVd92xsmZA', 'tweet': 20483, 'media': 1950, 'profileurl': 'https://pbs.twimg.com/profile_images/1333357590911152132/WNtw6XJI.jpg', 'bannerurl': 'https://pbs.twimg.com/profile_banners/880317891249188864/1606732197', 'favourites': 110200, 'pinned': False, 'pinned_id': 1335930331111669761, 'profile_color': '1DA1F2', 'createat': datetime.datetime(2017, 6, 29, 6, 51, 55, tzinfo=datetime.timezone.utc)}
+    ```
+9. Get many Profile By ID **Example: I want get profile screen_name Tokino Sora and Shirakami Fubuki By ID**
+    ```py
+    >>> from pytwitterscraper import TwitterScraper
+    >>> tw = TwitterScraper()
+    >>> data = tw.get_profile(ids=[880317891249188864,997786053124616192])
+    >>> for data_mem in data :
+    >>>     print(data_mem.screen_name)
+    >>> tokino_sora
+    >>> shirakamifubuki
+    ```
+
+10. Get many Profile By Name **Example: I want get profile ID Tokino Sora and Shirakami Fubuki By Name**
+    ```py
+    >>> from pytwitterscraper import TwitterScraper
+    >>> tw = TwitterScraper()
+    >>> data = tw.get_profile(names=["tokino_sora","shirakamifubuki"])
+    >>> for data_mem in data :
+    >>>     print(data_mem.id)
+    >>> 880317891249188864
+    >>> 997786053124616192
     ```
 
 # Lastest 
