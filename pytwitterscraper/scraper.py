@@ -4,17 +4,11 @@ import time
 import json
 import datetime
 import requests
-<<<<<<< HEAD
-from requests_html import HTMLSession
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-from fake_useragent import UserAgent
-=======
 import random
 import importlib.resources
 import os
 from requests_html import HTMLSession
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
->>>>>>> 1b6dd21... Fix URL
 from .scraperresult import TwitterScraperResultProfile, TwitterScraperTrends, TwitterSearchKeywords, TwitterScraperTweets
 
 class TwitterScraper:
@@ -26,22 +20,9 @@ class TwitterScraper:
 		self.api = "https://api.twitter.com/"
 
 		#Target URL
-<<<<<<< HEAD
-		# self.profile_withname = "graphql/4S2ihIKfF3xhp-ENxvUAfQ/UserByScreenName?variables=%7B%22screen_name%22%3A%22{}%22%2C%22withHighlightedLabel%22%3Atrue%7D"
-		# self.profile_withid = "i/api/2/timeline/profile/{}.json?tweet_mode=extended&count=1&userId={}&count=1"
-
-		self.profile = "1.1/users/lookup.json?{}={}"
-
-		self.user_agent = UserAgent().firefox
-=======
 		self.profile = "1.1/users/lookup.json?{}={}"
 
 		self.user_agent = self.__load_user_agent()
-
-		self.proxy_enable = proxy_enable
-		self.proxy_http = "http://" + str(proxy_http)
-		self.proxy_https = "https://" + str(proxy_https)
->>>>>>> 1b6dd21... Fix URL
 
 		self.proxy_enable = proxy_enable
 		self.proxy_http = "http://" + str(proxy_http)
@@ -94,22 +75,14 @@ class TwitterScraper:
 						TwitterScraperResultProfile(
 							twitter_id=data_tw["id"],
 							twitter_name=data_tw["name"],
-<<<<<<< HEAD
-							twitter_url=data_tw["url"],
-=======
 							twitter_url=(self.url + data_tw["screen_name"]),
->>>>>>> 1b6dd21... Fix URL
 							twitter_screenname=data_tw["screen_name"],
 							twitter_location=data_tw["location"],
 							twitter_entities=data_tw["entities"],
 							twitter_description=data_tw["description"] if "description" in data_tw else None ,
 							twitter_verifed=data_tw["verified"] if "verified" in data_tw else None,
 							twitter_pinned=True if len(data_tw["pinned_tweet_ids"]) is 0 else False,
-<<<<<<< HEAD
-							twitter_pinned_id=data_tw["pinned_tweet_ids"][0],
-=======
 							twitter_pinned_id=data_tw["pinned_tweet_ids"][0] if not len(data_tw["pinned_tweet_ids"]) is 0 else None ,
->>>>>>> 1b6dd21... Fix URL
 							twitter_follower=data_tw["followers_count"],
 							twitter_following=data_tw["friends_count"] ,
 							twitter_tweet=data_tw["statuses_count"] if "statuses_count" in data_tw else None ,
@@ -130,22 +103,14 @@ class TwitterScraper:
 				return TwitterScraperResultProfile(
 					twitter_id=data_tw["id"],
 					twitter_name=data_tw["name"],
-<<<<<<< HEAD
-					twitter_url=data_tw["url"],
-=======
 					twitter_url=(self.url + data_tw["screen_name"]),
->>>>>>> 1b6dd21... Fix URL
 					twitter_screenname=data_tw["screen_name"],
 					twitter_location=data_tw["location"],
 					twitter_entities=data_tw["entities"],
 					twitter_description=data_tw["description"] if "description" in data_tw else None ,
 					twitter_verifed=data_tw["verified"] if "verified" in data_tw else None,
 					twitter_pinned=True if len(data_tw["pinned_tweet_ids"]) is 0 else False,
-<<<<<<< HEAD
-					twitter_pinned_id=data_tw["pinned_tweet_ids"][0],
-=======
 					twitter_pinned_id=data_tw["pinned_tweet_ids"][0] if not len(data_tw["pinned_tweet_ids"]) is 0 else None ,
->>>>>>> 1b6dd21... Fix URL
 					twitter_follower=data_tw["followers_count"],
 					twitter_following=data_tw["friends_count"] ,
 					twitter_tweet=data_tw["statuses_count"] if "statuses_count" in data_tw else None ,
@@ -469,7 +434,6 @@ class TwitterScraper:
 
 	def __getxguesttoken(self) -> str :
 		proxy = {}
-<<<<<<< HEAD
 
 		if self.proxy_enable == True :
 			proxy = {
@@ -481,19 +445,6 @@ class TwitterScraper:
 			session = HTMLSession()
 			resp = session.post((self.api + "1.1/guest/activate.json"), headers=self.__getheaderstoken(), proxies=proxy, verify=False)
 
-=======
-
-		if self.proxy_enable == True :
-			proxy = {
-				"http" : self.proxy_http,
-				"https" : self.proxy_https
-			}
-
-		while True :
-			session = HTMLSession()
-			resp = session.post((self.api + "1.1/guest/activate.json"), headers=self.__getheaderstoken(), proxies=proxy, verify=False)
-
->>>>>>> 1b6dd21... Fix URL
 			if resp.status_code != 429 or resp.status_code != 403 or resp.status_code != 400 :
 				# Get JS Data
 				js_data = resp.json()
@@ -516,13 +467,10 @@ class TwitterScraper:
 		
 		return res
 	
-<<<<<<< HEAD
-=======
 	def __load_user_agent(self) :
 		with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"user_agent.json"),"r") as data :
 			return random.choice(json.loads(data.read()))
 
->>>>>>> 1b6dd21... Fix URL
 	def __get_twid(self, arr) -> dict:
 		s = 0
 		res = []
