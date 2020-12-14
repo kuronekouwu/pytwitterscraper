@@ -9,7 +9,7 @@ with open("requirements.txt","r",encoding="utf-8") as requirements:
 
 setuptools.setup(
 	name="pytwitterscraper",
-	version="1.3.3-4",
+	version="1.3.3-6",
 	author="M-307",
 	author_email="contact@m-307.tk",
 	description="Twitter Scraper using Python",
