@@ -19,4 +19,3 @@ soupsieve==2.1
 tqdm==4.54.1
 urllib3==1.26.2
 w3lib==1.22.0
-importlib==1.0.4
