@@ -392,13 +392,13 @@ class TwitterScraper:
 					self.xguest = self.__getxguesttoken()
 
 				if "x-rate-limit-remaining" in headers :
-					if headers["x-rate-limit-remaining"] <= 0 :
+					if headers["x-rate-limit-remaining"] >= 1 :
 						if resp.status_code != 429 :
 							return resp
 				else :
 					if resp.status_code != 429 :
 						return resp
-
+					
 			except requests.exceptions.SSLError as e :
 				i += 1
 				print(f"Connect Proxy Failed... Try connect of [ {i} / 10 ]")
