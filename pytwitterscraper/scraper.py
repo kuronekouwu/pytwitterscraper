@@ -392,7 +392,7 @@ class TwitterScraper:
 					self.xguest = self.__getxguesttoken()
 
 				if "x-rate-limit-remaining" in headers :
-					if headers["x-rate-limit-remaining"] >= 1 :
+					if int(headers["x-rate-limit-remaining"]) >= 1 :
 						if resp.status_code != 429 :
 							return resp
 				else :
@@ -411,7 +411,7 @@ class TwitterScraper:
 	
 	
 	# Private Function
-	def __get_token(self) -> str :
+	def __get_token(self) -> str : 
 		session = HTMLSession()
 		resp = session.get(self.url)
 		links = resp.html.find("link")
