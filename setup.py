@@ -25,5 +25,5 @@ setuptools.setup(
 	],
 	install_requires=required,
 	python_requires=">=3.6",
-	data_files=[('lib/site-packages/pytwitterscraper', ['pytwitterscraper/user_agent.json'])]
+	data_files=[('lib/site-packages/pytwitterscraper', ['pytwitterscraper/user_agent.json','pytwitterscraper/woeid.json'])]
 )
