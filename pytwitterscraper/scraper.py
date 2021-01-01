@@ -244,8 +244,11 @@ class TwitterScraper:
 
 		resp = self.__requestsdata(
 			url=self.api,
-			target=f"1.1/trends/place.json?id={self.country_code[id]}"
+			target=f"1.1/trends/place.json?id={self.country_code[code]}"
 		)
+
+		if resp.status_code >= 400 :
+			raise Exception("ISO Code not founded!")
 
 		data = resp.json()
 
