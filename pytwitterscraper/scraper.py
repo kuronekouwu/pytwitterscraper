@@ -31,6 +31,8 @@ class TwitterScraper:
 		self.token = self.__get_token()
 		self.xguest = self.__getxguesttoken()
 
+		self.country_code = self.__getcountry_code()
+
 	#Public Function
 	def get_profile(self, name: str=None, names: list=None, id: str=None, ids: dict=None) -> dict :
 		target = None
@@ -81,8 +83,8 @@ class TwitterScraper:
 							twitter_entities=data_tw["entities"],
 							twitter_description=data_tw["description"] if "description" in data_tw else None ,
 							twitter_verifed=data_tw["verified"] if "verified" in data_tw else None,
-							twitter_pinned=True if len(data_tw["pinned_tweet_ids"]) is 0 else False,
-							twitter_pinned_id=data_tw["pinned_tweet_ids"][0] if not len(data_tw["pinned_tweet_ids"]) is 0 else None ,
+							twitter_pinned=True if len(data_tw["pinned_tweet_ids"]) == 0 else False,
+							twitter_pinned_id=data_tw["pinned_tweet_ids"][0] if len(data_tw["pinned_tweet_ids"]) != 0 else None ,
 							twitter_follower=data_tw["followers_count"],
 							twitter_following=data_tw["friends_count"] ,
 							twitter_tweet=data_tw["statuses_count"] if "statuses_count" in data_tw else None ,
@@ -109,8 +111,8 @@ class TwitterScraper:
 					twitter_entities=data_tw["entities"],
 					twitter_description=data_tw["description"] if "description" in data_tw else None ,
 					twitter_verifed=data_tw["verified"] if "verified" in data_tw else None,
-					twitter_pinned=True if len(data_tw["pinned_tweet_ids"]) is 0 else False,
-					twitter_pinned_id=data_tw["pinned_tweet_ids"][0] if not len(data_tw["pinned_tweet_ids"]) is 0 else None ,
+					twitter_pinned=True if len(data_tw["pinned_tweet_ids"]) == 0 else False,
+					twitter_pinned_id=data_tw["pinned_tweet_ids"][0] if len(data_tw["pinned_tweet_ids"]) != 0 else None ,
 					twitter_follower=data_tw["followers_count"],
 					twitter_following=data_tw["friends_count"] ,
 					twitter_tweet=data_tw["statuses_count"] if "statuses_count" in data_tw else None ,
@@ -237,25 +239,23 @@ class TwitterScraper:
 			twitter_data=tweet
 		)
 
-	def get_trends(self) :
+	def get_trends(self, code="Universal") :
 		name_trend = []
 
 		resp = self.__requestsdata(
 			url=self.api,
-			target=f"2/guide.json?tcount=20&tab_category=objective_trends"
+			target=f"1.1/trends/place.json?id={self.country_code[id]}"
 		)
 
 		data = resp.json()
 
-		for entryid in data["timeline"]["instructions"][1]["addEntries"]["entries"] :
-			if entryid["entryId"] == "trends" :
-				for items in entryid["content"]["timelineModule"]["items"] :
-					name_trend.append({
-						"name" : "%s" % items["item"]["content"]["trend"]["name"], 
-						"description" : "%s" % items["item"]["content"]["trend"]["description"] if "description" in items["item"]["content"]["trend"] else None
-					})
-
-				break
+		for items in data[0]["trends"] :
+			name_trend.append({
+				"name" : "%s" % items["name"], 
+				"description" : "%s" % items["description"] if "description" in items else None,
+				"url" :  "%s" % items["url"],
+				"tweet" : "%s" % items["tweet_volume"]
+			})
 
 		return TwitterScraperTrends(
 			twitter_data=name_trend
@@ -467,6 +467,10 @@ class TwitterScraper:
 		
 		return res
 	
+	def __getcountry_code(self) :
+		with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"woeid.json"),"r") as data :
+			return json.loads(data.read())
+
 	def __load_user_agent(self) :
 		with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"user_agent.json"),"r") as data :
 			return random.choice(json.loads(data.read()))
