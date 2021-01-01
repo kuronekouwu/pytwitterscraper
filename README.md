@@ -36,7 +36,7 @@ If you have step by step You can able to use pytwitterscraper
 | get_tweets(id,count=20) | Get List Tweet from Profille Twitter By ID |
 | get_tweetinfo(id,count=20) | Get Tweet Information By ID |
 | get_tweetcomments(id) | Get Tweet Comments By ID **Top 10 Comment** | 
-| get_trends() | Get Trend Hashtags **UPDATE : You can able to use country code to get trends overworld!** |
+| get_trends(code) | Get Trend Hashtags **UPDATE : You can able to use country code to get trends overworld!** |
 | searchkeywords(query) | Search Keyworld With Users and Topics |
 
 # Example Code
