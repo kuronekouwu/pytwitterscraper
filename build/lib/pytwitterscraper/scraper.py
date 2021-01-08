@@ -3,74 +3,128 @@ import re
 import time
 import json
 import datetime
+import requests
+import random
+import importlib.resources
+import os
 from requests_html import HTMLSession
-from fake_useragent import UserAgent
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
 from .scraperresult import TwitterScraperResultProfile, TwitterScraperTrends, TwitterSearchKeywords, TwitterScraperTweets
 
 class TwitterScraper:
-	def __init__(self) :
+	def __init__(self, proxy_enable=False, proxy_http=None, proxy_https=None) :
+		# Disable Waring Text
+		requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
+
 		self.url = "https://twitter.com/"
 		self.api = "https://api.twitter.com/"
 
 		#Target URL
-		self.profile_withname = "graphql/4S2ihIKfF3xhp-ENxvUAfQ/UserByScreenName?variables=%7B%22screen_name%22%3A%22{}%22%2C%22withHighlightedLabel%22%3Atrue%7D"
-		self.profile_withid = "i/api/2/timeline/profile/{}.json?tweet_mode=extended&count=1&userId={}&count=1"
+		self.profile = "1.1/users/lookup.json?{}={}"
 
-		self.user_agent = UserAgent().firefox
+		self.user_agent = self.__load_user_agent()
+
+		self.proxy_enable = proxy_enable
+		self.proxy_http = "http://" + str(proxy_http)
+		self.proxy_https = "https://" + str(proxy_https)
 
 		self.token = self.__get_token()
 		self.xguest = self.__getxguesttoken()
 
+		self.country_code = self.__getcountry_code()
+
 	#Public Function
-	def get_profile(self, name: str=None, id: str=None) -> dict :
+	def get_profile(self, name: str=None, names: list=None, id: str=None, ids: dict=None) -> dict :
 		target = None
 		if not name is None :
-			url = self.api
-			target = self.profile_withname.format(name)
+			target = self.profile.format("screen_name",name)
 		elif not id is None :
-			url = self.url
-			target = self.profile_withid.format(id,id)
+			target = self.profile.format("user_id",id)
+		elif not names is None :
+			target = [self.__get_twid(names), "screen_name"]
+		elif not ids is None :
+			target = [self.__get_twid(ids),"user_id"]
+		
+		if not name is None or not id is None :
+			resp = self.__requestsdata(
+				url=self.api,
+				target=target
+			)
 
-		resp = self.__requestsdata(
-			url=url,
-			target=target
-		)
+			data = resp.json()
+		else :
+			data = []
+			for x in target[0] :
+				# print(x)
+				resp = self.__requestsdata(
+					url=self.api,
+					target=self.profile.format(target[1],x)
+				)
+				
+				for y in resp.json() :
+					data.append(y)
 
-		data = resp.json()
+
 
 		if resp.status_code >= 200 :
-			if "data" in data :
-				if len(data["data"]) == 0 :
-					raise Exception("Error! User Not Found!")
-					return False
-			elif "errors" in data :
+			if len(data) == 0 or "errors" in data:
 				raise Exception("Error! User Not Found!")
-				return False
+			
+			if len(data) >= 2 or not names is None or not ids is None  : 
+				res = []
+				for data_tw in data :
+					res.append(
+						TwitterScraperResultProfile(
+							twitter_id=data_tw["id"],
+							twitter_name=data_tw["name"],
+							twitter_url=(self.url + data_tw["screen_name"]),
+							twitter_screenname=data_tw["screen_name"],
+							twitter_location=data_tw["location"],
+							twitter_entities=data_tw["entities"],
+							twitter_description=data_tw["description"] if "description" in data_tw else None ,
+							twitter_verifed=data_tw["verified"] if "verified" in data_tw else None,
+							twitter_pinned=True if len(data_tw["pinned_tweet_ids"]) == 0 else False,
+							twitter_pinned_id=data_tw["pinned_tweet_ids"][0] if len(data_tw["pinned_tweet_ids"]) != 0 else None ,
+							twitter_follower=data_tw["followers_count"],
+							twitter_following=data_tw["friends_count"] ,
+							twitter_tweet=data_tw["statuses_count"] if "statuses_count" in data_tw else None ,
+							twitter_media=data_tw["media_count"] if "media_count" in data_tw else None ,
+							twitter_profileurl=data_tw["profile_image_url_https"].replace("_normal","") if "profile_image_url_https" in data_tw else None,
+							twitter_favourites=data_tw["favourites_count"],
+							twitter_bannerurl=data_tw["profile_banner_url"] if "profile_banner_url" in data_tw else None,
+							twitter_profile_color=data_tw["profile_link_color"] if "profile_link_color" in data_tw else None,
+							twitter_extended_url=data_tw["url"] if "url" in data_tw else None ,
+							twitter_createat=datetime.datetime.strptime(data_tw["created_at"],"%a %b %d %H:%M:%S %z %Y"),
+						)
+					)
+				
+				return res
+			else :
+				# print(data)
+				data_tw = data[0]
+				return TwitterScraperResultProfile(
+					twitter_id=data_tw["id"],
+					twitter_name=data_tw["name"],
+					twitter_url=(self.url + data_tw["screen_name"]),
+					twitter_screenname=data_tw["screen_name"],
+					twitter_location=data_tw["location"],
+					twitter_entities=data_tw["entities"],
+					twitter_description=data_tw["description"] if "description" in data_tw else None ,
+					twitter_verifed=data_tw["verified"] if "verified" in data_tw else None,
+					twitter_pinned=True if len(data_tw["pinned_tweet_ids"]) == 0 else False,
+					twitter_pinned_id=data_tw["pinned_tweet_ids"][0] if len(data_tw["pinned_tweet_ids"]) != 0 else None ,
+					twitter_follower=data_tw["followers_count"],
+					twitter_following=data_tw["friends_count"] ,
+					twitter_tweet=data_tw["statuses_count"] if "statuses_count" in data_tw else None ,
+					twitter_media=data_tw["media_count"] if "media_count" in data_tw else None ,
+					twitter_profileurl=data_tw["profile_image_url_https"].replace("_normal","") if "profile_image_url_https" in data_tw else None,
+					twitter_favourites=data_tw["favourites_count"],
+					twitter_bannerurl=data_tw["profile_banner_url"] if "profile_banner_url" in data_tw else None,
+					twitter_profile_color=data_tw["profile_link_color"] if "profile_link_color" in data_tw else None,
+					twitter_extended_url=data_tw["url"] if "url" in data_tw else None ,
+					twitter_createat=datetime.datetime.strptime(data_tw["created_at"],"%a %b %d %H:%M:%S %z %Y"),
+				)
 
-			if not name is None :
-				dataall = data["data"]["user"]
-				dataprofile = data["data"]["user"]["legacy"]
-			elif not id is None :
-				dataall = data["globalObjects"]["users"]["%s" % id]
-				dataprofile = data["globalObjects"]["users"]["%s" % id]
-
-			return TwitterScraperResultProfile(
-				twitter_id=dataall["rest_id"] if "rest_id" in dataall else dataall["id_str"],
-				twitter_name=dataprofile["name"],
-				twitter_url=self.url + dataprofile["screen_name"],
-				twitter_screenname=dataprofile["screen_name"],
-				twitter_location=dataprofile["location"],
-				twitter_description=dataprofile["description"] if "description" in dataprofile else None ,
-				twitter_verifed=dataprofile["verified"] if "verified" in dataprofile else None,
-				twitter_follower=dataprofile["followers_count"],
-				twitter_following=dataprofile["friends_count"] ,
-				twitter_tweet=dataprofile["statuses_count"] if "statuses_count" in dataprofile else None ,
-				twitter_media=dataprofile["media_count"] if "media_count" in dataprofile else None ,
-				twitter_profileurl=dataprofile["profile_image_url_https"].replace("_normal","") if "profile_image_url_https" in dataprofile else None ,
-				twitter_bannerurl=dataprofile["profile_banner_url"] if "profile_banner_url" in dataprofile else None,
-				twitter_extended_url=dataprofile["url"] if "url" in dataprofile else None ,
-				twitter_createat=datetime.datetime.strptime(dataprofile["created_at"],"%a %b %d %H:%M:%S %z %Y"),
-			)
 
 	def get_tweets(self,id: str=None,count: int=20) :
 		i = 0
@@ -185,25 +239,26 @@ class TwitterScraper:
 			twitter_data=tweet
 		)
 
-	def get_trends(self) :
+	def get_trends(self, code="Universal") :
 		name_trend = []
 
 		resp = self.__requestsdata(
 			url=self.api,
-			target=f"2/guide.json?tcount=20&tab_category=objective_trends"
+			target=f"1.1/trends/place.json?id={self.country_code[code]}"
 		)
+
+		if resp.status_code >= 400 :
+			raise Exception("ISO Code not founded!")
 
 		data = resp.json()
 
-		for entryid in data["timeline"]["instructions"][1]["addEntries"]["entries"] :
-			if entryid["entryId"] == "trends" :
-				for items in entryid["content"]["timelineModule"]["items"] :
-					name_trend.append({
-						"name" : "%s" % items["item"]["content"]["trend"]["name"], 
-						"description" : "%s" % items["item"]["content"]["trend"]["description"] if "description" in items["item"]["content"]["trend"] else None
-					})
-
-				break
+		for items in data[0]["trends"] :
+			name_trend.append({
+				"name" : "%s" % items["name"], 
+				"description" : "%s" % items["description"] if "description" in items else None,
+				"url" :  "%s" % items["url"],
+				"tweet" : "%s" % items["tweet_volume"]
+			})
 
 		return TwitterScraperTrends(
 			twitter_data=name_trend
@@ -315,24 +370,51 @@ class TwitterScraper:
 
 	def __requestsdata(self,url,target) :
 		session = HTMLSession()
-		resp = session.get(
-			(url + target),
-			headers=self.__getdataheaders()
-		)
+		while True :
+			i = 0
+			try :
+				proxy = {}
+				if self.proxy_enable == True :
+					proxy = {
+						"http" : self.proxy_http,
+						"https" : self.proxy_https
+					}
 
-		if resp.status_code == 403 :
-			self.token = self.__get_token()
-			self.xguest = self.__getxguesttoken()
+				# Requests Data
+				resp = session.get(
+					(url + target),
+					headers=self.__getdataheaders(),
+					proxies=proxy,
+					verify=False
+				)
+			
+				headers = resp.headers
 
-			resp = session.get(
-				(url + target),
-				headers=self.__getdataheaders()
-			)
+				if resp.status_code == 403 :
+					self.token = self.__get_token()
+					self.xguest = self.__getxguesttoken()
 
-		return resp
+				if "x-rate-limit-remaining" in headers :
+					if int(headers["x-rate-limit-remaining"]) >= 1 :
+						if resp.status_code != 429 :
+							return resp
+				else :
+					if resp.status_code != 429 :
+						return resp
+					
+			except requests.exceptions.SSLError as e :
+				i += 1
+				print(f"Connect Proxy Failed... Try connect of [ {i} / 10 ]")
 
-	#Private Fuction
-	def __get_token(self) -> str :
+				if i >= 10 :
+					# print(e)
+					raise requests.exceptions.SSLError(e)
+
+				pass
+	
+	
+	# Private Function
+	def __get_token(self) -> str : 
 		session = HTMLSession()
 		resp = session.get(self.url)
 		links = resp.html.find("link")
@@ -354,10 +436,24 @@ class TwitterScraper:
 		return token_regex.findall(resp.text)[0]
 
 	def __getxguesttoken(self) -> str :
-		session = HTMLSession()
-		resp = session.post((self.api + "1.1/guest/activate.json"), headers=self.__getheaderstoken())
+		proxy = {}
 
-		return resp.json()["guest_token"]
+		if self.proxy_enable == True :
+			proxy = {
+				"http" : self.proxy_http,
+				"https" : self.proxy_https
+			}
+
+		while True :
+			session = HTMLSession()
+			resp = session.post((self.api + "1.1/guest/activate.json"), headers=self.__getheaderstoken(), proxies=proxy, verify=False)
+
+			if resp.status_code != 429 or resp.status_code != 403 or resp.status_code != 400 :
+				# Get JS Data
+				js_data = resp.json()
+
+				if "guest_token" in js_data :
+					return js_data["guest_token"]
 
 	def __getheaderstoken(self) :
 		res = {
@@ -371,5 +467,44 @@ class TwitterScraper:
 		res["Authorization"] = "Bearer %s" % self.token
 		res["x-guest-token"] = self.xguest
 		res["User-Agent"] = self.user_agent
+		
+		return res
+	
+	def __getcountry_code(self) :
+		with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"woeid.json"),"r") as data :
+			return json.loads(data.read())
+
+	def __load_user_agent(self) :
+		with open(os.path.join(os.path.dirname(os.path.abspath(__file__)),"user_agent.json"),"r") as data :
+			return random.choice(json.loads(data.read()))
+
+	def __get_twid(self, arr) -> dict:
+		s = 0
+		res = []
+
+		while True :
+			all_data = len(arr)
+			get_ch = self.__format(arr,start=s)
+
+			if all_data == get_ch[1] :
+				res.append(get_ch[0])
+				break
+			
+			res.append(get_ch[0])
+			s += get_ch[1]
 
 		return res
+
+	def __format(self, arr: list, start=0) -> dict :
+		prams = ""
+		i,j  = 0, start
+
+		for x in arr[start:len(arr)] :
+			prams = prams + str(x) + ","
+			if i == 99:
+				return [prams,j]
+
+			i += 1
+			j += 1
+
+		return [prams,j]

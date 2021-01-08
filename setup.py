@@ -9,7 +9,7 @@ with open("requirements.txt","r",encoding="utf-8") as requirements:
 
 setuptools.setup(
 	name="pytwitterscraper",
-	version="1.3.3-6",
+	version="1.3.4-2",
 	author="M-307",
 	author_email="contact@m-307.tk",
 	description="Twitter Scraper using Python",
@@ -25,5 +25,5 @@ setuptools.setup(
 	],
 	install_requires=required,
 	python_requires=">=3.6",
-	data_files=[('lib/site-packages/pytwitterscraper', ['pytwitterscraper/user_agent.json','pytwitterscraper/woeid.json'])]
+	include_package_data=True
 )
