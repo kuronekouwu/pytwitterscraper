@@ -41,4 +41,3 @@ class TwitterSearchKeywords :
 		twitter_userdata: dict, twitter_topicsdata: dict ) :
 			self.users = twitter_userdata
 			self.topics = twitter_topicsdata
-
