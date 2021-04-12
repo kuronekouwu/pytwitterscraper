@@ -318,21 +318,21 @@ class TwitterScraper:
 						})
 
 			i += 1
-		
+
 		return TwitterScraperTweets(
 			twitter_data=commants
 		)
 
 
 	def searchkeywords(self, query=None) :
-		i,j = 0, 0 
+		i,j = 0, 0
 
 		users = []
 		topics = []
 
 		resp = self.__requestsdata(
 			url=self.url,
-			target=f"i/api/1.1/search/typeahead.json?q={query}&src=search_box&result_type=events%2Cusers%2Ctopics"
+			target="i/api/1.1/search/typeahead.json?q="+ requests.utils.quote(query) +"&src=search_box&result_type=events%2Cusers%2Ctopics"
 		)
 
 		data = resp.json()
@@ -358,7 +358,8 @@ class TwitterScraper:
 				"tags" : []
 			})
 
-			for tags in datausers["tokens"] :
+			# if "tokens" in data
+			for tags in datatopics["tokens"] :
 				topics[j]["tags"].append(tags["token"])
 
 			j += 1
